@@ -16,11 +16,11 @@ class MySQLConnection:
                 print("Running Query:", query)
      
                 executable = cursor.execute(query, data)
-                if query.lower().find("select") >= 0:
+                if query.lower().find("insert") >= 0:
                     # if the query is an insert, return the id of the last row, since that is the row we just added
                     self.connection.commit()
                     return cursor.lastrowid
-                elif query.lower().find("insert") >= 0:
+                elif query.lower().find("select") >= 0:
                     # if the query is a select, return everything that is fetched from the database
                     # the result will be a list of dictionaries
                     result = cursor.fetchall()
