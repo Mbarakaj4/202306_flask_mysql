@@ -1,0 +1,63 @@
+Primer error:
+AttributeError: 'NoneType' object has no attribute 'encoding'
+
+Cambiando el valor a cualquier otro, me da el error que la cadena que le pase no tiene un atributo encoding
+al parecer se esperaba un objeto que tenga este atributo pero recibió una cadena
+...
+connection = pymysql.connect(host = 'localhost',
+                                    user = 'root', # change the user and password as needed
+                                    password = '', 
+                                    db = db,
+                                    charset = 'hola', <--- error
+                                    cursorclass = pymysql.cursors.DictCursor,
+                                    autocommit = True)
+...
+
+Segundo error:
+TypeError: 'bool' object is not iterable
+
+Después de remover el parámetro "data = 'none'" me devuelve el error bool object is not iterable, esto me da a
+entender que la función devolvió un booleano en vez de una lista
+...
+    def query_db(self, query):
+        with self.connection.cursor() as cursor:
+            try:
+...
+
+Tercer error:
+TypeError: 'bool' object is not iterable
+Comente una variable que parecia no hacer nada ya que nunca era referenciada en otro lado, a cambio de ello
+recibi el mismo error de antes. al parecer data esta relacionado con esta variable y cursor.execute
+
+...
+            try:
+                query = cursor.mogrify(query, data)
+                print("Running Query:", query)
+     
+                #executable = cursor.execute(query, data) <-- error
+                if query.lower().find("insert") >= 0:
+                    # if the query is an insert, return the id of the last row, since that is the row we just added
+                    self.connection.commit()
+                    return cursor.lastrowid
+...
+
+Cuarto error:
+TypeError: 'NoneType' object is not iterable
+
+Después de intercambiar los strings select y insert, me dio un un error parecido a los de arriba pero el mensaje
+es diferente, dice que un none no es iterable. creería que es por los tipos de datos que maneja cada función
+...
+                if query.lower().find("select") >= 0: <-- error
+                    # if the query is an insert, return the id of the last row, since that is the row we just added
+                    self.connection.commit()
+                    return cursor.lastrowid
+                elif query.lower().find("insert") >= 0: <-- error
+                    # if the query is a select, return everything that is fetched from the database
+                    # the result will be a list of dictionaries
+                    result = cursor.fetchall()
+                    return result
+                else:
+                    # if the query is not an insert or a select, such as an update or delete, commit the changes
+                    # return nothing
+                    self.connection.commit()
+...
